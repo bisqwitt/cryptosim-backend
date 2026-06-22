@@ -1,7 +1,7 @@
 package ch.santis.cryptosim.backend.controller;
 
-import ch.santis.cryptosim.backend.dto.CryptoHistoricalDataDto;
-import ch.santis.cryptosim.backend.dto.CryptoMarketDataDto;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalData;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoMarketData;
 import ch.santis.cryptosim.backend.service.CryptoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,17 +21,17 @@ public class CryptoController {
     }
 
     @GetMapping("/market")
-    public List<CryptoMarketDataDto> getMarketData() {
+    public List<CryptoMarketData> getMarketData() {
         return cryptoService.getMarketData();
     }
 
     @GetMapping("/{id}")
-    public CryptoMarketDataDto getMarketData(@PathVariable String id) {
+    public CryptoMarketData getMarketData(@PathVariable String id) {
         return cryptoService.getMarketData(id);
     }
 
     @GetMapping("/{id}/history")
-    public CryptoHistoricalDataDto getHistoricalData(@PathVariable String id) {
+    public CryptoHistoricalData getHistoricalData(@PathVariable String id) {
         return cryptoService.getHistoricalData(id);
     }
 

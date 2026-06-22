@@ -1,10 +1,8 @@
-package ch.santis.cryptosim.backend.dto;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package ch.santis.cryptosim.backend.dto.crypto;
 
 import java.math.BigDecimal;
 
-public record CryptoMarketDataDto(
+public record CryptoMarketData(
    String id,
    String name,
    String symbol,
