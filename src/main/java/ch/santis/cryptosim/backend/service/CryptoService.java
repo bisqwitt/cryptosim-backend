@@ -1,9 +1,9 @@
 package ch.santis.cryptosim.backend.service;
 
 import ch.santis.cryptosim.backend.client.CoinGeckoApiClient;
-import ch.santis.cryptosim.backend.dto.CryptoHistoricalDataDto;
-import ch.santis.cryptosim.backend.dto.CryptoHistoricalDataPointDto;
-import ch.santis.cryptosim.backend.dto.CryptoMarketDataDto;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalData;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalDataPoint;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoMarketData;
 import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoMarketChartResponse;
 import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoMarketResponse;
 import org.springframework.stereotype.Service;
@@ -19,11 +19,11 @@ public class CryptoService {
         this.coinGeckoApiClient = coinGeckoApiClient;
     }
 
-    public List<CryptoMarketDataDto> getMarketData() {
+    public List<CryptoMarketData> getMarketData() {
         List<CoinGeckoMarketResponse> response = coinGeckoApiClient.getMarkets();
 
         return response.stream()
-                .map(crypto -> new CryptoMarketDataDto(
+                .map(crypto -> new CryptoMarketData(
                         crypto.id(),
                         crypto.name(),
                         crypto.symbol(),
@@ -36,10 +36,10 @@ public class CryptoService {
                 .toList();
     }
 
-    public CryptoMarketDataDto getMarketData(String id) {
+    public CryptoMarketData getMarketData(String id) {
         CoinGeckoMarketResponse response = coinGeckoApiClient.getCoin(id);
 
-        return new CryptoMarketDataDto(
+        return new CryptoMarketData(
                 response.id(),
                 response.name(),
                 response.symbol(),
@@ -51,20 +51,20 @@ public class CryptoService {
         );
     }
 
-    public CryptoHistoricalDataDto getHistoricalData(String id) {
+    public CryptoHistoricalData getHistoricalData(String id) {
         CoinGeckoMarketChartResponse response = coinGeckoApiClient.getMarketChart(id);
 
-        return new CryptoHistoricalDataDto(
+        return new CryptoHistoricalData(
                 response.prices().stream()
-                        .map(point -> new CryptoHistoricalDataPointDto(point.timestamp(), point.value()))
+                        .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
                         .toList(),
 
                 response.marketCaps().stream()
-                        .map(point -> new CryptoHistoricalDataPointDto(point.timestamp(), point.value()))
+                        .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
                         .toList(),
 
                 response.totalVolumes().stream()
-                        .map(point -> new CryptoHistoricalDataPointDto(point.timestamp(), point.value()))
+                        .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
                         .toList()
         );
     }
