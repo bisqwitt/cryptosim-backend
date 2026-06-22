@@ -19,10 +19,9 @@ public class CoinGeckoApiException extends CryptoSimException {
         };
 
         String suggestion = switch (status.value()) {
-            case 400, 403 -> "Please contact the administrator.";
             case 401 -> "Please setup a valid API key.";
             case 429 -> "Please wait a minute before trying again.";
-            default -> "";
+            default -> "Please contact the administrator.";
         };
 
         return new CoinGeckoApiException(status, message, suggestion);
