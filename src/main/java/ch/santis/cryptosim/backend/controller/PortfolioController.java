@@ -1,12 +1,15 @@
 package ch.santis.cryptosim.backend.controller;
 
 import ch.santis.cryptosim.backend.dto.portfolio.CreatePortfolioRequest;
+import ch.santis.cryptosim.backend.dto.portfolio.PortfolioPositionHoldingResponse;
 import ch.santis.cryptosim.backend.dto.portfolio.PortfolioResponse;
 import ch.santis.cryptosim.backend.service.PortfolioService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -30,6 +33,16 @@ public class PortfolioController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(savedPortfolio);
+    }
+
+    @GetMapping("/{id}/{cryptoId}/holding")
+    public PortfolioPositionHoldingResponse getHoldingOfPosition(
+            @PathVariable Long id,
+            @PathVariable String cryptoId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    LocalDate date) {
+        return date == null ? null /*TODO*/ : portfolioService.getHoldingOfPositionAtDate(id, cryptoId, date);
     }
 
 }

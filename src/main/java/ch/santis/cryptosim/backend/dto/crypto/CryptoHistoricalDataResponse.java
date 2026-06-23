@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record CryptoHistoricalData(
+public record CryptoHistoricalDataResponse(
         @JsonProperty("prices")
         List<CryptoHistoricalDataPoint> prices,
 

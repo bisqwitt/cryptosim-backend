@@ -1,13 +1,13 @@
 package ch.santis.cryptosim.backend.controller;
 
-import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalData;
-import ch.santis.cryptosim.backend.dto.crypto.CryptoMarketData;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalDataResponse;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoMarketDataResponse;
+import ch.santis.cryptosim.backend.dto.crypto.CryptoPriceResponse;
 import ch.santis.cryptosim.backend.service.CryptoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -21,17 +21,27 @@ public class CryptoController {
     }
 
     @GetMapping("/market")
-    public List<CryptoMarketData> getMarketData() {
+    public List<CryptoMarketDataResponse> getMarketData() {
         return cryptoService.getMarketData();
     }
 
     @GetMapping("/{id}")
-    public CryptoMarketData getMarketData(@PathVariable String id) {
+    public CryptoMarketDataResponse getMarketData(@PathVariable String id) {
         return cryptoService.getMarketData(id);
     }
 
+    @GetMapping("/{id}/price")
+    public CryptoPriceResponse getPrice(
+            @PathVariable String id,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+        return cryptoService.getPrice(id, date);
+    }
+
     @GetMapping("/{id}/history")
-    public CryptoHistoricalData getHistoricalData(@PathVariable String id) {
+    public CryptoHistoricalDataResponse getHistoricalData(@PathVariable String id) {
         return cryptoService.getHistoricalData(id);
     }
 
