@@ -1,17 +1,25 @@
 package ch.santis.cryptosim.backend.dto.coingecko;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record CoinGeckoMarketChartResponse(
+
         @JsonProperty("prices")
-        List<CoinGeckoMarketChartPoint> prices,
+        List<MarketChartPoint> prices,
 
         @JsonProperty("market_caps")
-        List<CoinGeckoMarketChartPoint> marketCaps,
+        List<MarketChartPoint> marketCaps,
 
         @JsonProperty("total_volumes")
-        List<CoinGeckoMarketChartPoint> totalVolumes
+        List<MarketChartPoint> totalVolumes
 ) {
+        @JsonFormat(shape = JsonFormat.Shape.ARRAY)
+        public record MarketChartPoint(
+                long timestamp,
+                BigDecimal value
+        ) {}
 }

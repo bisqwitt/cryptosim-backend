@@ -2,7 +2,7 @@ package ch.santis.cryptosim.backend.dto.crypto;
 
 import java.math.BigDecimal;
 
-public record CryptoMarketData(
+public record CryptoMarketDataResponse(
    String id,
    String name,
    String symbol,

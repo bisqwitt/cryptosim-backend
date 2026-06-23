@@ -1,14 +1,16 @@
 package ch.santis.cryptosim.backend.service;
 
 import ch.santis.cryptosim.backend.client.CoinGeckoApiClient;
-import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalData;
-import ch.santis.cryptosim.backend.dto.crypto.CryptoHistoricalDataPoint;
-import ch.santis.cryptosim.backend.dto.crypto.CryptoMarketData;
+import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoPriceAtDateResponse;
+import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoPriceResponse;
+import ch.santis.cryptosim.backend.dto.crypto.*;
 import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoMarketChartResponse;
 import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoMarketResponse;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CryptoService {
@@ -19,11 +21,11 @@ public class CryptoService {
         this.coinGeckoApiClient = coinGeckoApiClient;
     }
 
-    public List<CryptoMarketData> getMarketData() {
+    public List<CryptoMarketDataResponse> getMarketData() {
         List<CoinGeckoMarketResponse> response = coinGeckoApiClient.getMarkets();
 
         return response.stream()
-                .map(crypto -> new CryptoMarketData(
+                .map(crypto -> new CryptoMarketDataResponse(
                         crypto.id(),
                         crypto.name(),
                         crypto.symbol(),
@@ -36,10 +38,10 @@ public class CryptoService {
                 .toList();
     }
 
-    public CryptoMarketData getMarketData(String id) {
+    public CryptoMarketDataResponse getMarketData(String id) {
         CoinGeckoMarketResponse response = coinGeckoApiClient.getCoin(id);
 
-        return new CryptoMarketData(
+        return new CryptoMarketDataResponse(
                 response.id(),
                 response.name(),
                 response.symbol(),
@@ -51,10 +53,29 @@ public class CryptoService {
         );
     }
 
-    public CryptoHistoricalData getHistoricalData(String id) {
+    public CryptoPriceResponse getPrice(String id, LocalDate date) {
+        if(date != null) return getPriceAtDate(id, date);
+        Map<String, CoinGeckoPriceResponse> response = coinGeckoApiClient.getCoinPrice(id);
+
+        return new CryptoPriceResponse(
+                id,
+                response.get(id).usd()
+        );
+    }
+
+    private CryptoPriceResponse getPriceAtDate(String id, LocalDate date) {
+        CoinGeckoPriceAtDateResponse response = coinGeckoApiClient.getCoinPriceAtDate(id, date);
+
+        return new CryptoPriceResponse(
+                response.id(),
+                response.marketData().currentPrice().usd()
+        );
+    }
+
+    public CryptoHistoricalDataResponse getHistoricalData(String id) {
         CoinGeckoMarketChartResponse response = coinGeckoApiClient.getMarketChart(id);
 
-        return new CryptoHistoricalData(
+        return new CryptoHistoricalDataResponse(
                 response.prices().stream()
                         .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
                         .toList(),
