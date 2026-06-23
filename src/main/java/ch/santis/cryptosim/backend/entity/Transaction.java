@@ -44,6 +44,21 @@ public class Transaction {
 
     public Transaction() {}
 
+    public Transaction(
+            Portfolio portfolio,
+            String cryptoId,
+            BigDecimal amountUsd,
+            BigDecimal amountCrypto,
+            TransactionType type,
+            LocalDate date) {
+        this.portfolio = portfolio;
+        this.cryptoId = cryptoId;
+        this.amountUsd = amountUsd;
+        this.amountCrypto = amountCrypto;
+        this.type = type;
+        this.date = date;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

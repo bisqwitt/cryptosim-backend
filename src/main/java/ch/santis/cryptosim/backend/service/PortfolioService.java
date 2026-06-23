@@ -1,19 +1,17 @@
 package ch.santis.cryptosim.backend.service;
 
-import ch.santis.cryptosim.backend.controller.PortfolioController;
 import ch.santis.cryptosim.backend.dto.portfolio.CreatePortfolioRequest;
 import ch.santis.cryptosim.backend.dto.portfolio.PortfolioPositionHoldingResponse;
 import ch.santis.cryptosim.backend.dto.portfolio.PortfolioResponse;
 import ch.santis.cryptosim.backend.entity.Portfolio;
-import ch.santis.cryptosim.backend.entity.Transaction;
 import ch.santis.cryptosim.backend.entity.TransactionType;
 import ch.santis.cryptosim.backend.error.PortfolioNotFoundException;
+import ch.santis.cryptosim.backend.mapper.PortfolioMapper;
 import ch.santis.cryptosim.backend.repository.PortfolioRepository;
 import ch.santis.cryptosim.backend.repository.TransactionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,33 +25,28 @@ public class PortfolioService {
 
     private final CryptoService cryptoService;
 
-    public PortfolioService(PortfolioRepository portfolioRepository, TransactionRepository transactionRepository, CryptoService cryptoService) {
+    private final PortfolioMapper mapper;
+
+    public PortfolioService(
+            PortfolioRepository portfolioRepository,
+            TransactionRepository transactionRepository,
+            CryptoService cryptoService,
+            PortfolioMapper mapper) {
         this.portfolioRepository = portfolioRepository;
         this.transactionRepository = transactionRepository;
         this.cryptoService = cryptoService;
+        this.mapper = mapper;
     }
 
     public List<PortfolioResponse> getAll() {
         return portfolioRepository.findAll().stream()
-                .map(portfolio -> new PortfolioResponse(
-                        portfolio.getId(),
-                        portfolio.getName(),
-                        portfolio.getCredit()
-                ))
+                .map(mapper::toResponse)
                 .toList();
     }
 
     public PortfolioResponse createPortfolio(CreatePortfolioRequest request) {
-        Portfolio portfolio = new Portfolio();
-        portfolio.setName(request.name());
-        portfolio.setCredit(request.credit());
-
-        Portfolio saved = portfolioRepository.save(portfolio);
-        return new PortfolioResponse(
-                saved.getId(),
-                saved.getName(),
-                saved.getCredit()
-        );
+        Portfolio saved = portfolioRepository.save(mapper.fromRequest(request));
+        return mapper.toResponse(saved);
     }
 
     public PortfolioPositionHoldingResponse getHoldingOfPositionAtDate(Long id, String cryptoId, LocalDate date) {
@@ -67,6 +60,15 @@ public class PortfolioService {
 
         BigDecimal value = cryptoService.getPrice(cryptoId, date).price().multiply(holding);
         return new PortfolioPositionHoldingResponse(holding, value);
+    }
+
+    public void adjustCredit(Long id, BigDecimal amount, TransactionType type) {
+        Portfolio portfolio = get(id);
+        portfolio.setCredit(type == TransactionType.BUY
+                ? portfolio.getCredit().subtract(amount)
+                : portfolio.getCredit().add(amount));
+
+        portfolioRepository.save(portfolio);
     }
 
     public Portfolio get(Long id) {

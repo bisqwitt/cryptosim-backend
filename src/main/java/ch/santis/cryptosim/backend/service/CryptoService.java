@@ -6,6 +6,7 @@ import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoPriceResponse;
 import ch.santis.cryptosim.backend.dto.crypto.*;
 import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoMarketChartResponse;
 import ch.santis.cryptosim.backend.dto.coingecko.CoinGeckoMarketResponse;
+import ch.santis.cryptosim.backend.mapper.CryptoMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,77 +17,35 @@ import java.util.Map;
 public class CryptoService {
 
     private final CoinGeckoApiClient coinGeckoApiClient;
+    private final CryptoMapper cryptoMapper;
 
-    public CryptoService(CoinGeckoApiClient coinGeckoApiClient) {
+    public CryptoService(CoinGeckoApiClient coinGeckoApiClient, CryptoMapper cryptoMapper) {
         this.coinGeckoApiClient = coinGeckoApiClient;
+        this.cryptoMapper = cryptoMapper;
     }
 
     public List<CryptoMarketDataResponse> getMarketData() {
-        List<CoinGeckoMarketResponse> response = coinGeckoApiClient.getMarkets();
-
-        return response.stream()
-                .map(crypto -> new CryptoMarketDataResponse(
-                        crypto.id(),
-                        crypto.name(),
-                        crypto.symbol(),
-                        crypto.currentPrice(),
-                        crypto.priceChangePercentage24h(),
-                        crypto.priceChangePercentage7d(),
-                        crypto.marketCap(),
-                        crypto.totalVolume()
-                ))
+        return coinGeckoApiClient.getMarkets()
+                .stream()
+                .map(cryptoMapper::toMarketDataResponse)
                 .toList();
     }
 
     public CryptoMarketDataResponse getMarketData(String id) {
-        CoinGeckoMarketResponse response = coinGeckoApiClient.getCoin(id);
-
-        return new CryptoMarketDataResponse(
-                response.id(),
-                response.name(),
-                response.symbol(),
-                response.currentPrice(),
-                response.priceChangePercentage24h(),
-                response.priceChangePercentage7d(),
-                response.marketCap(),
-                response.totalVolume()
-        );
+        return cryptoMapper.toMarketDataResponse(coinGeckoApiClient.getCoin(id));
     }
 
     public CryptoPriceResponse getPrice(String id, LocalDate date) {
-        if(date != null) return getPriceAtDate(id, date);
-        Map<String, CoinGeckoPriceResponse> response = coinGeckoApiClient.getCoinPrice(id);
+        if (date != null) {
+            return cryptoMapper.toPriceResponse(coinGeckoApiClient.getCoinPriceAtDate(id, date));
+        }
 
-        return new CryptoPriceResponse(
-                id,
-                response.get(id).usd()
-        );
-    }
-
-    private CryptoPriceResponse getPriceAtDate(String id, LocalDate date) {
-        CoinGeckoPriceAtDateResponse response = coinGeckoApiClient.getCoinPriceAtDate(id, date);
-
-        return new CryptoPriceResponse(
-                response.id(),
-                response.marketData().currentPrice().usd()
-        );
+        return cryptoMapper.toPriceResponse(id, coinGeckoApiClient.getCoinPrice(id).get(id));
     }
 
     public CryptoHistoricalDataResponse getHistoricalData(String id) {
-        CoinGeckoMarketChartResponse response = coinGeckoApiClient.getMarketChart(id);
-
-        return new CryptoHistoricalDataResponse(
-                response.prices().stream()
-                        .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
-                        .toList(),
-
-                response.marketCaps().stream()
-                        .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
-                        .toList(),
-
-                response.totalVolumes().stream()
-                        .map(point -> new CryptoHistoricalDataPoint(point.timestamp(), point.value()))
-                        .toList()
+        return cryptoMapper.toHistoricalDataResponse(
+                coinGeckoApiClient.getMarketChart(id)
         );
     }
 

@@ -27,6 +27,11 @@ public class Portfolio {
 
     public Portfolio() {}
 
+    public Portfolio(String name, BigDecimal credit) {
+        this.name = name;
+        this.credit = credit;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
