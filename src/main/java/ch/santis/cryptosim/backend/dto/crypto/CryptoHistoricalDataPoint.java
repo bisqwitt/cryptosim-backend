@@ -5,5 +5,4 @@ import java.math.BigDecimal;
 public record CryptoHistoricalDataPoint(
         long timestamp,
         BigDecimal value
-) {
-}
+) {}

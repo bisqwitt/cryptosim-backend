@@ -15,7 +15,7 @@ public class PortfolioMapper {
     public PortfolioResponse toResponse(Portfolio portfolio) {
         return new PortfolioResponse(
                 portfolio.getId(),
-                portfolio.getName(),
+                portfolio.getName().trim(),
                 portfolio.getCredit()
         );
     }

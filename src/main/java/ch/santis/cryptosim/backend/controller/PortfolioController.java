@@ -1,8 +1,6 @@
 package ch.santis.cryptosim.backend.controller;
 
-import ch.santis.cryptosim.backend.dto.portfolio.CreatePortfolioRequest;
-import ch.santis.cryptosim.backend.dto.portfolio.PortfolioPositionHoldingResponse;
-import ch.santis.cryptosim.backend.dto.portfolio.PortfolioResponse;
+import ch.santis.cryptosim.backend.dto.portfolio.*;
 import ch.santis.cryptosim.backend.service.PortfolioService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -35,6 +33,29 @@ public class PortfolioController {
                 .body(savedPortfolio);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<PortfolioResponse> update(
+            @PathVariable Long id,
+            @RequestBody UpdatePortfolioRequest request) {
+        PortfolioResponse updatedPortfolio = portfolioService.updatePortfolio(id, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedPortfolio);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        portfolioService.deletePortfolio(id);
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public PortfolioDetailsResponse getPortfolioDetails(@PathVariable Long id) {
+        return portfolioService.getPortfolioDetails(id);
+    }
+
     @GetMapping("/{id}/{cryptoId}/holding")
     public PortfolioPositionHoldingResponse getHoldingOfPosition(
             @PathVariable Long id,
@@ -42,7 +63,7 @@ public class PortfolioController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate date) {
-        return date == null ? null /*TODO*/ : portfolioService.getHoldingOfPositionAtDate(id, cryptoId, date);
+        return date == null ? null /*TODO*/ : portfolioService.getHoldingOfPosition(id, cryptoId, date);
     }
 
 }

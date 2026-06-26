@@ -13,6 +13,7 @@ public class CoinGeckoApiException extends CryptoSimException {
             case 400 -> "Invalid request parameters.";
             case 401 -> "CoinGecko API key is invalid or missing.";
             case 403 -> "Access to CoinGecko was denied.";
+            case 404 -> "Cryptocurrency not found.";
             case 429 -> "CoinGecko rate limit reached.";
             case 500, 503 -> "CoinGecko API is currently unavailable.";
             default -> "CoinGecko request failed.";
@@ -20,6 +21,7 @@ public class CoinGeckoApiException extends CryptoSimException {
 
         String suggestion = switch (status.value()) {
             case 401 -> "Please setup a valid API key.";
+            case 404 -> "Please select a valid Cryptocurrency";
             case 429 -> "Please wait a minute before trying again.";
             default -> "Please contact the administrator.";
         };

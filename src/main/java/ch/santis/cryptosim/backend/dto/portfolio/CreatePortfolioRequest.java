@@ -6,4 +6,9 @@ public record CreatePortfolioRequest(
         String name,
         BigDecimal credit
 ) {
+
+        public CreatePortfolioRequest {
+                if(name != null) name = name.trim();
+        }
+
 }
