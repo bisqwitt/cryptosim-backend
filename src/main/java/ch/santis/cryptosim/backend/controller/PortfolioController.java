@@ -63,7 +63,7 @@ public class PortfolioController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate date) {
-        return date == null ? null /*TODO*/ : portfolioService.getHoldingOfPosition(id, cryptoId, date);
+        return portfolioService.getHoldingOfPosition(id, cryptoId, date);
     }
 
 }
