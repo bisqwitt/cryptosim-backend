@@ -1,11 +1,19 @@
 package ch.santis.cryptosim.backend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Check;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "portfolio")
+@Table(
+        name = "portfolio",
+        check = {
+                @CheckConstraint(
+                        name = "chk_portfolio_credit_positive",
+                        constraint = "credit >= 0"
+                )
+        })
 public class Portfolio {
     @Id
     @SequenceGenerator(

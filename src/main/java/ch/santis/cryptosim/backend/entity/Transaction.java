@@ -4,10 +4,20 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "transaction")
+@Table(
+        name = "transaction",
+        indexes = {
+                @Index(name = "idx_transaction_portfolio_id", columnList = "portfolioId"),
+                @Index(name = "idx_transaction_portfolio_crypto_id", columnList = "portfolioId, cryptoId")
+        },
+        check = {
+                @CheckConstraint(
+                        name = "chk_transaction_amounts_positive",
+                        constraint = "amountUsd > 0 AND amountCrypto > 0"
+                )
+        })
 public class Transaction {
 
     @Id
