@@ -4,10 +4,14 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "transaction")
+@Table(
+    name = "transaction",
+    indexes = {
+            @Index(name = "idx_transaction_portfolio_id", columnList = "portfolioId"),
+            @Index(name = "idx_transaction_portfolio_crypto_id", columnList = "portfolioId, cryptoId")
+        })
 public class Transaction {
 
     @Id
